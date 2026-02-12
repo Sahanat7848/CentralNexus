@@ -1,0 +1,9 @@
+{
+    "rest-client.environmentVariables": {
+        "$shared": {},
+        "dev": {
+            "base_url": "http://127.0.0.1:8000/api/v1",
+            "boy": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzY2MTk4MDcyLCJpYXQiOjE3NjYxMTE2NzJ9.FXs5Pqo61LAMyVuWwTrCjeZTiwgXuYau2CUHxG27ubs.eyJzdWIiOiJiYWJlIiwiZXhwIjoxNzY2MTk2MDk0LCJpYXQiOjE3NjYxMDk2OTR9.pb9rtGhdgc5b67PGJvt-l47lFyU0Pvr5nw33gQ-hdGA"
+        }
+    }
+}
