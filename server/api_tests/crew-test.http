@@ -1,0 +1,14 @@
+@base_url = http://localhost:8000/api
+@access_token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMCIsImV4cCI6MTc2NzI1MDYyOSwiaWF0IjoxNzY2NjQ1ODI5fQ.wqHLqC7hhSpdCaNpP5N_CkZJiU3svx7ngcvRZ4PuYTc
+### join mission
+# @prompt mission_id Mission ID to Join
+POST  {{base_url}}/crew_operation/join/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+
+### leave mission
+# @prompt mission_id Mission ID to Leave
+DELETE  {{base_url}}/crew_operation/leave/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}

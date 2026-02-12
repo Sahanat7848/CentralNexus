@@ -1,0 +1,64 @@
+<div class="tactical-chat animate-in">
+    <div class="chat-header">
+        <div class="header-glitch"></div>
+        <div class="agent-profile">
+            <div class="avatar-hex">
+                <div class="hex-border"></div>
+                <img [src]="data.friend.avatar_url || 'assets/default-avatar.png'" [alt]="data.friend.display_name">
+            </div>
+            <div class="agent-info">
+                <h2 class="agent-name">{{ data.friend.display_name }} <span class="tag">#{{ data.friend.tag }}</span>
+                </h2>
+
+            </div>
+        </div>
+
+        <div class="header-actions">
+
+            <button class="close-btn" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <div class="chat-monitor" #scrollMe>
+
+
+        <div class="message-feed">
+            <div class="msg-frame" *ngFor="let msg of messages()"
+                [ngClass]="{'own': msg.sender_id === currentUserId(), 'peer': msg.sender_id !== currentUserId()}">
+                <div class="msg-content">
+                    <div class="msg-meta">
+                        <span class="msg-sender">{{ msg.sender_id === currentUserId() ? 'YOU' : data.friend.display_name
+                            }}</span>
+                        <span class="msg-time">{{ msg.created_at | date:'HH:mm' }}</span>
+                    </div>
+                    <div class="bubble">
+                        {{ msg.content }}
+                        <div class="bubble-edge"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="input-console">
+        <form (ngSubmit)="sendMessage()" class="console-form">
+            <div class="console-prefix">>>&nbsp;</div>
+            <input type="text" [(ngModel)]="newMessage" name="newMessage" placeholder="ENTER COMMAND..."
+                autocomplete="off">
+            <button type="submit" [disabled]="!newMessage.trim()" class="burst-btn">
+                <mat-icon>send</mat-icon>
+                <span>Send</span>
+            </button>
+        </form>
+        <div class="console-footer">
+            <div class="bar-block"></div>
+            <div class="bar-block"></div>
+            <div class="bar-block"></div>
+            <span class="bit-rate">SYNC_OK</span>
+        </div>
+    </div>
+</div>

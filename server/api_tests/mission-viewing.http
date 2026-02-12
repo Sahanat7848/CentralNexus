@@ -1,0 +1,36 @@
+@base_url = http://localhost:8000/api
+@access_token = {{login.response.body.access_token}}
+
+### login
+# @name login
+# @prompt username
+POST {{base_url}}/authentication/login
+Content-Type: application/json
+
+{
+    "username": "{{username}}",
+    "password": "P@ssw0rd!"
+}
+
+### get mission by id
+# @prompt mission_id Mission ID
+GET  {{base_url}}/view/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+
+
+
+### get missions with name
+# @prompt name Name to Search
+GET  {{base_url}}/view/gets?name={{name}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+
+### get missions with name and status
+# @prompt name Name to Search
+# @prompt status Status to Search
+GET  {{base_url}}/view/gets?name={{name}}&status={{status}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}

@@ -1,0 +1,126 @@
+<div class="missions-page">
+    <div class="page-header">
+        <div class="header-content">
+            <h1 class="page-title">Adventure Hub 🌟</h1>
+            <p class="page-subtitle">Find new friends and join fun activities together! ✨</p>
+        </div>
+    </div>
+
+    <mat-card class="filter-card">
+        <mat-card-header>
+            <mat-card-title>
+                <mat-icon>search</mat-icon>
+                <span>Find Something Fun 🔍</span>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="filter-form">
+                <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Search Activities</mat-label>
+                    <input matInput [(ngModel)]="filter.name" placeholder="What are you looking for? ✨"
+                        (keyup.enter)="onSubmit()">
+                    <mat-icon matPrefix>star</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="status-field">
+                    <mat-label>Activity Status</mat-label>
+                    <mat-select [(ngModel)]="filter.status">
+                        <mat-option [value]="undefined">All Activities</mat-option>
+                        <mat-option value="Open">Open</mat-option>
+                        <mat-option value="InProgress">In Progress</mat-option>
+                        <mat-option value="Completed">Done! ✨</mat-option>
+                        <mat-option value="Failed">Oh no! 🐾</mat-option>
+                    </mat-select>
+                    <mat-icon matPrefix>favorite</mat-icon>
+                </mat-form-field>
+
+                <div class="action-buttons">
+                    <button mat-raised-button color="primary" (click)="onSubmit()" class="search-btn">
+                        <mat-icon>check</mat-icon>
+                        <span>Let's Find!</span>
+                    </button>
+                    <button mat-button (click)="clearFilter()" class="clear-btn">
+                        <span>Reset</span>
+                    </button>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <div class="missions-grid-container">
+        @if (isLoading) {
+        <div class="loading-shade">
+            <mat-spinner diameter="50"></mat-spinner>
+        </div>
+        }
+
+        <div class="mission-grid">
+            @for (mission of dataSource.data; track mission.id) {
+            <mat-card class="mission-card" [ngClass]="mission.status">
+                <div class="card-status-bar"></div>
+                <div class="status-badge" [ngClass]="mission.status">
+                    {{mission.status === 'Completed' ? 'Done! ✨' : (mission.status === 'Failed' ? 'Oh no! 🐾' :
+                    mission.status)}}
+                </div>
+
+                <mat-card-header>
+                    <div class="mission-title-group">
+                        <mat-icon class="title-icon">auto_awesome</mat-icon>
+                        <mat-card-title>{{mission.name}}</mat-card-title>
+                    </div>
+                </mat-card-header>
+
+                <mat-card-content>
+                    <div class="mission-briefing">
+                        <p>{{mission.description || 'No details provided yet! ✨'}}</p>
+                    </div>
+
+                    <div class="mission-meta">
+                        <div class="meta-item">
+                            <mat-icon matTooltip="Organizer">face</mat-icon>
+                            <span>{{mission.chief_display_name}}</span>
+                        </div>
+                        <div class="meta-item">
+                            <mat-icon matTooltip="Friends joined">groups_2</mat-icon>
+                            <span>{{mission.crew_count}}</span>
+                        </div>
+                        <div class="meta-item">
+                            <mat-icon matTooltip="Started on">calendar_today</mat-icon>
+                            <span>{{mission.created_at | date:'MMM d'}}</span>
+                        </div>
+                    </div>
+                </mat-card-content>
+
+                <mat-card-actions>
+                    @if(isSignin()){
+                    @if(mission.is_chief) {
+                    <button mat-button class="join-action-btn chief" disabled>
+                        <mat-icon>favorite</mat-icon>
+                        <span>My Activity 🎀</span>
+                    </button>
+                    } @else if(mission.is_joined) {
+                    <button mat-button class="join-action-btn joined" (click)="leaveMission(mission)">
+                        <mat-icon>waving_hand</mat-icon>
+                        <span>Leave mission</span>
+                    </button>
+                    } @else {
+                    <button mat-button class="join-action-btn" (click)="joinMission(mission)">
+                        <mat-icon>celebration</mat-icon>
+                        <span>Join in! ✨</span>
+                    </button>
+                    }
+                    }
+                </mat-card-actions>
+            </mat-card>
+            } @empty {
+            <div class="empty-state">
+                <mat-icon>sentiment_dissatisfied</mat-icon>
+                <h3>Nothing found yet!</h3>
+                <p>Try searching for something else or check back later! ✨</p>
+            </div>
+            }
+        </div>
+
+        <mat-paginator [pageSizeOptions]="[12, 24, 48, 96]" aria-label="Select page of missions"></mat-paginator>
+    </div>
+</div>

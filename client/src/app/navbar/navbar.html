@@ -1,0 +1,65 @@
+<nav class="navbar">
+    <div class="navbar-container">
+        <!-- Logo Section -->
+        <div class="logo-section" routerLink="/" routerLinkActive="logo-active"
+            [routerLinkActiveOptions]="{exact: true}">
+            <div class="logo-icon">
+                <img src="/assets/logo.svg" alt="Logo" style="width: 38px; height: 38px;">
+            </div>
+            <span class="logo-text">Central<span>Nexus</span></span>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="nav-links">
+            <a class="nav-link" routerLink="/missions" routerLinkActive="active">
+                <mat-icon>explore</mat-icon>
+                <span>Missions</span>
+            </a>
+            @if (isLoggedIn()) {
+            <a class="nav-link" routerLink="/my-missions" routerLinkActive="active">
+                <mat-icon>stars</mat-icon>
+                <span>My Missions</span>
+            </a>
+            <a class="nav-link" routerLink="/friends" routerLinkActive="active">
+                <mat-icon>people</mat-icon>
+                <span>Friends</span>
+            </a>
+            }
+        </div>
+
+        <span class="spacer"></span>
+
+        <!-- Action Items -->
+        <div class="nav-actions">
+            @if (!isLoggedIn()) {
+            <button mat-button routerLink="/login" class="login-btn-premium">
+                <mat-icon>login</mat-icon>
+                <span>Login</span>
+            </button>
+            } @else {
+            <div class="profile-container" [matMenuTriggerFor]="profileMenu">
+                <div class="profile-info">
+                    <span class="display-name">{{display_name()}}</span>
+                    <span class="role-tag">Agent</span>
+                </div>
+                <div class="avatar-wrapper">
+                    <img [src]="avatar_url()" class="avatar" [alt]="display_name() + ' avatar'">
+                    <div class="online-status"></div>
+                </div>
+                <mat-icon class="dropdown-icon">expand_more</mat-icon>
+            </div>
+
+            <mat-menu #profileMenu="matMenu" class="premium-profile-menu" xPosition="before">
+                <button mat-menu-item routerLink="/profile">
+                    <mat-icon>person_outline</mat-icon>
+                    <span>My Profile</span>
+                </button>
+                <button mat-menu-item (click)="logout()">
+                    <mat-icon>power_settings_new</mat-icon>
+                    <span class="logout-text">Sign Out</span>
+                </button>
+            </mat-menu>
+            }
+        </div>
+    </div>
+</nav>

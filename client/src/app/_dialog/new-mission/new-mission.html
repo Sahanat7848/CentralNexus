@@ -1,0 +1,35 @@
+<h2 mat-dialog-title class="premium-dialog-title">
+    <mat-icon>rocket_launch</mat-icon>
+    <span>Start a New Mission! 🌸</span>
+</h2>
+
+<mat-dialog-content class="premium-dialog-content">
+    <div class="mission-form">
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Mission Designation</mat-label>
+            <input matInput [(ngModel)]="addMission.name" placeholder="Enter mission name" required
+                #nameInput="ngModel">
+            <mat-icon matPrefix>label</mat-icon>
+            <mat-error *ngIf="nameInput.invalid">Mission name is required</mat-error>
+            <mat-hint>Give your mission a clear, unique name</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Mission Objectives</mat-label>
+            <textarea matInput [(ngModel)]="addMission.description" placeholder="Describe the mission goals..."
+                rows="4"></textarea>
+            <mat-icon matPrefix>description</mat-icon>
+            <mat-hint>Provide essential briefing details for the crew</mat-hint>
+        </mat-form-field>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="premium-dialog-actions">
+    <button mat-button mat-dialog-close class="cancel-btn">
+        <span>Go Back</span>
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!addMission.name" class="create-btn">
+        <mat-icon>auto_awesome</mat-icon>
+        <span>Let's Go! 🚀</span>
+    </button>
+</mat-dialog-actions>

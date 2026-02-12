@@ -1,0 +1,38 @@
+<h1>500</h1>
+<p id="error">SERVER_ERROR // SOMETHING_WENT_WRONG 🐾</p>
+<p>The Nexus is having a tiny nap. Please try again later! ✨</p>
+
+<div id="container">
+  <div class="server">
+    <div class="hdd-container">
+      <div class="hdd">
+        <div class="led red-led"></div>
+      </div>
+      <div class="hdd">
+        <div class="led"></div>
+      </div>
+      <div class="hdd">
+        <div class="led red-led"></div>
+      </div>
+    </div>
+    <div class="cooling-system">
+      <div class="grid"></div>
+      <div class="grid"></div>
+    </div>
+  </div>
+</div>
+
+@if (errorMsg) {
+<div style="margin-top: 40px; color: #a1a1aa; font-family: 'Fredoka', sans-serif;">
+  <p>Details for the techies: 🌸</p>
+  <pre
+    style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; display: inline-block;">{{errorMsg}}</pre>
+</div>
+}
+
+<div style="margin-top: 40px;">
+  <button mat-raised-button color="primary" routerLink="/"
+    style="border-radius: 100px; padding: 12px 32px; font-family: 'Fredoka', sans-serif;">
+    <mat-icon>home</mat-icon> Take me home! ✨
+  </button>
+</div>

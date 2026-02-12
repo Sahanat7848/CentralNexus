@@ -1,0 +1,45 @@
+<h2 mat-dialog-title class="premium-dialog-title">
+  <mat-icon>face</mat-icon>
+  <span>New Look! ✨</span>
+</h2>
+
+<mat-dialog-content class="premium-dialog-content">
+  <div class="content-container">
+    @if (imgPreview()) {
+    <div class="image-preview">
+      <img [src]="imgPreview()" alt="image-preview" />
+    </div>
+    } @else {
+    <div class="empty-upload-state" (click)="filePicker.click()">
+      <mat-icon>auto_awesome</mat-icon>
+      <p>Tap to pick a cute photo!</p>
+      <span>JPG, PNG or JPEG (max 2MB)</span>
+    </div>
+    }
+
+    @if (imgFile() && !errorMessage()) {
+    <div class="file-info">
+      <mat-icon>insert_drive_file</mat-icon>
+      <span>{{ imgFile()?.name }}</span>
+    </div>
+    }
+
+    @if (errorMessage()) {
+    <div class="error-msg">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+    }
+  </div>
+
+  <input type="file" #filePicker (change)="onImagePicked($event)" accept=".jpg, .png, .jpeg" hidden />
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="premium-dialog-actions">
+  <button mat-button mat-dialog-close class="cancel-btn">Not now</button>
+  <button mat-button class="select-btn" (click)="filePicker.click()" *ngIf="imgPreview()">Try Another</button>
+  <button mat-raised-button (click)="onSubmit()" [disabled]="!imgFile()" class="upload-btn">
+    <mat-icon>auto_awesome</mat-icon>
+    <span>Sparkle Up! ✨</span>
+  </button>
+</mat-dialog-actions>

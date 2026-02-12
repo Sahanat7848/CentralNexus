@@ -1,0 +1,14 @@
+use anyhow::Result;
+use async_trait::async_trait;
+
+use crate::domain::value_object::{
+    brawler_model::BrawlerModel, mission_filter::MissionFilter, mission_moddel::MissionModel,
+};
+
+#[async_trait]
+pub trait MissionViewingRepository {
+    async fn view_detail(&self, mission_id: i32) -> Result<MissionModel>;
+    async fn gets(&self, filter: &MissionFilter) -> Result<Vec<MissionModel>>;
+    async fn crew_counting(&self, mission_id: i32) -> Result<u32>;
+    async fn get_mission_crew(&self, mission_id: i32) -> Result<Vec<BrawlerModel>>;
+}

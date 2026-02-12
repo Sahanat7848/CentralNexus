@@ -1,0 +1,6 @@
+### health-check
+GET http://localhost:8000/api/util/health-check
+
+### make-error
+# @prompt 
+GET http://localhost:8000/api/util/make-error

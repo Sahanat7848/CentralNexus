@@ -1,0 +1,125 @@
+<div class="profile-container animate-in">
+  <div class="card-glass">
+    <!-- Header/Banner Section -->
+    <div class="banner-section">
+      <div class="top-overlay">
+        <div class="scan-line"></div>
+        <div class="coord-tag">PRTCL_NEXUS_V2.5 // SYSTM_ACTV</div>
+      </div>
+
+      <div class="action-dock">
+        <button class="icon-btn" (click)="openDialog()" title="Camera Link">
+          <mat-icon>photo_camera</mat-icon>
+        </button>
+        <button class="icon-btn logout" (click)="logout()" title="Terminate Session">
+          <mat-icon>power_settings_new</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Profile Hero Section -->
+    <div class="hero-section">
+      <div class="avatar-outer" (click)="openDialog()">
+        <div class="avatar-ring"></div>
+        <div class="avatar-holder">
+          <img [src]="avatarUrl() || 'assets/default-avatar.png'" [alt]="displayName()">
+          <div class="avatar-glitch-overlay"></div>
+        </div>
+      </div>
+
+      <div class="identity-block">
+        <div *ngIf="!isEditingName()" class="name-box" (click)="toggleEditName()">
+          <h1 class="agent-name">{{ displayName() }}<span class="agent-tag">#{{ tag() }}</span></h1>
+          <mat-icon class="pulse-icon">edit_square</mat-icon>
+        </div>
+
+        <div *ngIf="isEditingName()" class="edit-mode-box">
+          <input type="text" [(ngModel)]="tempName" class="name-field" (keyup.enter)="saveName()"
+            (keyup.escape)="toggleEditName()" autofocus>
+          <div class="edit-tools">
+            <button class="tool-btn save" (click)="saveName()"><mat-icon>check</mat-icon></button>
+            <button class="tool-btn cancel" (click)="toggleEditName()"><mat-icon>close</mat-icon></button>
+          </div>
+        </div>
+
+        <div class="rank-badge">
+          <mat-icon>verified</mat-icon>
+          <span>{{ stats.rank }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-node">
+        <span class="node-label">Total Ops</span>
+        <span class="node-value">{{ stats.missionsTotal }}</span>
+      </div>
+      <div class="stat-node highlight">
+        <span class="node-label">Success Rate</span>
+        <span class="node-value">{{ stats.successPercent }}%</span>
+      </div>
+      <div class="stat-node">
+        <span class="node-label">Core Status</span>
+        <span class="node-value active">{{ stats.activeStatus }}</span>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-body">
+      <!-- Recent Missions Section -->
+      <div class="data-sector">
+        <h3 class="sector-title">
+          <mat-icon>history_edu</mat-icon>
+          Recent Deployments
+        </h3>
+        <div class="mission-manifest">
+          <div class="manifest-item" *ngFor="let mission of recentMissions().slice(0, 3)">
+            <div class="m-prefix"></div>
+            <div class="m-details">
+              <span class="m-name">{{ mission.name }}</span>
+              <span class="m-meta">{{ mission.created_at | date:'MMM d, yyyy' }}</span>
+            </div>
+            <div class="status-pill" [attr.data-status]="mission.status">
+              {{ mission.status }}
+            </div>
+          </div>
+          <div *ngIf="recentMissions().length === 0" class="empty-msg">No recent deployments recorded.</div>
+        </div>
+      </div>
+
+      <!-- Combat Stats Section -->
+      <div class="data-sector">
+        <h3 class="sector-title">
+          <mat-icon>query_stats</mat-icon>
+          Operational Efficiency
+        </h3>
+        <div class="reflex-matrix">
+          <div class="reflex-row">
+            <div class="row-header">
+              <span>Mission Success</span>
+              <span class="val">{{ stats.successPercent }}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="stats.successPercent"></div>
+            </div>
+          </div>
+          <div class="reflex-row">
+            <div class="row-header">
+              <span>Mission Unsuccessful</span>
+              <span class="val">{{ stats.failurePercent }}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill failure" [style.width.%]="stats.failurePercent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <div class="footer-line"></div>
+      <div class="system-time">SYNC_TIME: {{ stats.joinDate }}</div>
+    </div>
+  </div>
+</div>

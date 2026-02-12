@@ -1,0 +1,114 @@
+<div class="friends-page">
+    <div class="stars-container"></div>
+    <div class="scanline"></div>
+
+    <div class="content-wrapper">
+        <header class="page-header animate-in">
+            <div class="identity-badge">Cute Team v2.5 🎀</div>
+            <div class="title-main">
+                <mat-icon class="glow-icon">auto_awesome</mat-icon>
+                <h1>My Sweet <span>Friends</span></h1>
+            </div>
+            <p class="subtitle">A place to keep track of all your wonderful friends and have fun together! ✨</p>
+        </header>
+
+        <section class="ops-center">
+            <div class="search-module animate-in-delayed">
+                <div class="search-input-wrapper" [class.focused]="isFocused">
+                    <mat-icon class="search-icon">search</mat-icon>
+                    <input type="text" [(ngModel)]="searchQuery" (focus)="isFocused = true" (blur)="isFocused = false"
+                        (keyup.enter)="search()" placeholder="Search for a new pal! (NAME#XXXX) ✨">
+                    <button class="execute-btn" (click)="search()" [disabled]="isSearching()">
+                        @if (isSearching()) {
+                        <div class="spinner"></div>
+                        } @else {
+                        <span>Find! 🔍</span>
+                        <mat-icon>chevron_right</mat-icon>
+                        }
+                    </button>
+                    <div class="search-border"></div>
+                </div>
+
+                @if (searchResults(); as result) {
+                <div class="result-display animate-scale">
+                    <div class="agent-profile-card">
+                        <div class="avatar-block">
+                            <img [src]="result.avatar_url || 'https://raw.githubusercontent.com/the-convergence/assets/main/default-avatar.png'"
+                                class="agent-avatar">
+                            <div class="level-badge">LV.99</div>
+                        </div>
+                        <div class="info-block">
+                            <div class="agent-id">#{{result.tag}}</div>
+                            <div class="agent-name">{{result.display_name}}</div>
+                            <div class="agent-meta">SECTOR: SWEET • STATUS: SUPER CUTE 💖</div>
+                        </div>
+                        <button class="link-btn" (click)="addFriend(result)" [disabled]="isAdding()">
+                            @if (isAdding()) {
+                            <div class="btn-spinner"></div>
+                            } @else {
+                            <mat-icon>favorite</mat-icon>
+                            <span>Add Friend! 🎀</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="network-status animate-in-more">
+                <div class="status-header">
+                    <div class="label">
+                        <mat-icon>face</mat-icon>
+                        <h2>Friendship Status 💖</h2>
+                    </div>
+                    <div class="count">{{friendsList().length}} Pals ✨</div>
+                </div>
+
+                <div class="grid-container">
+                    @for (friend of friendsList(); track friend.id) {
+                    <div class="agent-card" [style.--i]="$index">
+                        <div class="card-inner">
+                            <div class="card-header">
+                                <span class="serial">Friend #{{friend.id * 73}}</span>
+                                <div class="pulse-indicator"></div>
+                            </div>
+                            <div class="card-main">
+                                <img [src]="friend.avatar_url || 'https://raw.githubusercontent.com/the-convergence/assets/main/default-avatar.png'"
+                                    class="mini-avatar">
+                                <div class="friend-details">
+                                    <span class="f-name">{{friend.display_name}}</span>
+                                    <span class="f-tag">@{{friend.tag}}</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="footer-btn" title="CHAT" (click)="openChat(friend)">
+                                    <mat-icon>chat</mat-icon>
+                                </button>
+                                <button class="footer-btn" title="FAVORITE" (click)="viewFriendMission(friend)">
+                                    <mat-icon>favorite</mat-icon>
+                                </button>
+                                <button class="footer-btn danger" title="REMOVE">
+                                    <mat-icon>close</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-glow"></div>
+                    </div>
+                    } @empty {
+                    <div class="void-state">
+                        <div class="radar">
+                            <div class="beam"></div>
+                            <mat-icon class="radar-icon">sentiment_very_satisfied</mat-icon>
+                        </div>
+                        <h3>A little lonely here... 🐾</h3>
+                        <p>Start by adding some friends to your list! 🌸</p>
+                        <div class="loading-bar">
+                            <div class="bar-progress"></div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
