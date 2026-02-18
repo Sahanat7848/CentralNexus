@@ -97,7 +97,18 @@ export class Missions implements AfterViewInit, OnInit {
         });
       }
 
-      this.dataSource.data = results;
+      // ผสานข้อมูลใหม่กับข้อมูลเดิมเพื่อรักษาสถานะ Optimistic Update และการประมวลผล
+      const currentData = this.dataSource.data;
+      const mergedData = results.map(newMission => {
+        const existing = currentData.find(d => d.id === newMission.id);
+        if (existing && existing.is_processing) {
+          // หากยังประมวลผลค้างอยู่ ให้คงสถานะเดิมไว้ก่อนเพื่อไม่ให้เด้ง
+          return { ...newMission, is_joined: existing.is_joined, is_processing: true };
+        }
+        return newMission;
+      });
+
+      this.dataSource.data = mergedData;
     } catch (e) {
       console.error('Error fetching missions:', e);
     } finally {
@@ -159,7 +170,7 @@ export class Missions implements AfterViewInit, OnInit {
       // ส่งคำสั่งไปยัง Server เพื่อลบชื่อเราออก
       await this._missionService.leaveMission(mission.id);
       console.log(`Successfully left mission ${mission.id}`);
-      // อัปเดตข้อมูลแบบเงียบ
+      // อัปเดตข้อมูลแบบเงียบ (รอให้ sync เสร็จก่อนค่อยปลด lock)
       await this.onSubmit(true);
     } catch (e) {
       // หากล้มเหลว ให้กลับไปใช้ค่าเดิม
