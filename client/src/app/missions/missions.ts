@@ -58,6 +58,9 @@ export class Missions implements AfterViewInit, OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // เก็บสถานะที่เพิ่งกดเพื่อป้องกันการเด้งกลับ (Local State Override)
+  localOverrides = new Map<number, boolean>();
+
   constructor() {
     this.isSignin = computed(() => this._passportService.isSignin());
   }
@@ -97,6 +100,13 @@ export class Missions implements AfterViewInit, OnInit {
         });
       }
 
+      // บังคับใช้ค่าจาก Local Override เหนือคำสั่งจาก Server (ชั่วคราว)
+      results.forEach(m => {
+        if (this.localOverrides.has(m.id)) {
+          m.is_joined = this.localOverrides.get(m.id)!;
+        }
+      });
+
       this.dataSource.data = results;
     } catch (e) {
       console.error('Error fetching missions:', e);
@@ -126,13 +136,16 @@ export class Missions implements AfterViewInit, OnInit {
     mission.crew_count++;                // เพิ่มจำนวนคนขึ้น 1 คนทันที
 
     try {
-      // ส่งคำสั่งไปยัง Server เพื่อบันทึกลงฐานข้อมูลจริง
+      // จดจำเข้าสถานะใหม่ลง Local ทันที
+      this.localOverrides.set(mission.id, true);
+
+      // ส่งคำสั่งไปยัง Server เพื่อบันทึกสลงฐานข้อมูลจริง
       await this._missionService.joinMission(mission.id);
       console.log(`Successfully joined mission ${mission.id}`);
-      // อัปเดตข้อมูลแบบเงียบเพื่อไม่ให้หน้าจอกระพริบ (ทำเป็น Background เพื่อไม่ให้ปุ่มล็อคนาน)
       this.onSubmit(true);
     } catch (e) {
-      // หากเกิดข้อผิดพลาด ให้ดึงข้อมูลเก่ากลับมาแสดงผล
+      // หากเกิดข้อผิดพลาด ให้ดึงข้อมูลเก่ากลับมาแสดงผล และล้างค่า Local
+      this.localOverrides.delete(mission.id);
       mission.is_joined = prevStatus;
       mission.crew_count = prevCount;
       console.error('เกิดข้อผิดพลาดในการเข้าร่วมภารกิจ:', e);
@@ -156,13 +169,16 @@ export class Missions implements AfterViewInit, OnInit {
     mission.crew_count--;      // ลดจำนวนคนลง 1 คนทันที
 
     try {
+      // จดจำเข้าสถานะใหม่ลง Local ทันที
+      this.localOverrides.set(mission.id, false);
+
       // ส่งคำสั่งไปยัง Server เพื่อลบชื่อเราออก
       await this._missionService.leaveMission(mission.id);
       console.log(`Successfully left mission ${mission.id}`);
-      // อัปเดตข้อมูลแบบเงียบ (ทำเป็น Background เพื่อไม่ให้ปุ่มล็อคนาน)
       this.onSubmit(true);
     } catch (e) {
-      // หากล้มเหลว ให้กลับไปใช้ค่าเดิม
+      // หากล้มเหลว ให้กลับไปใช้ค่าเดิม และล้างค่า Local
+      this.localOverrides.delete(mission.id);
       mission.is_joined = prevStatus;
       mission.crew_count = prevCount;
       console.error('เกิดข้อผิดพลาดในการออกจากภารกิจ:', e);
