@@ -97,18 +97,7 @@ export class Missions implements AfterViewInit, OnInit {
         });
       }
 
-      // ผสานข้อมูลใหม่กับข้อมูลเดิมเพื่อรักษาสถานะ Optimistic Update และการประมวลผล
-      const currentData = this.dataSource.data;
-      const mergedData = results.map(newMission => {
-        const existing = currentData.find(d => d.id === newMission.id);
-        if (existing && existing.is_processing) {
-          // หากยังประมวลผลค้างอยู่ ให้คงสถานะเดิมไว้ก่อนเพื่อไม่ให้เด้ง
-          return { ...newMission, is_joined: existing.is_joined, is_processing: true };
-        }
-        return newMission;
-      });
-
-      this.dataSource.data = mergedData;
+      this.dataSource.data = results;
     } catch (e) {
       console.error('Error fetching missions:', e);
     } finally {
@@ -140,8 +129,8 @@ export class Missions implements AfterViewInit, OnInit {
       // ส่งคำสั่งไปยัง Server เพื่อบันทึกลงฐานข้อมูลจริง
       await this._missionService.joinMission(mission.id);
       console.log(`Successfully joined mission ${mission.id}`);
-      // อัปเดตข้อมูลแบบเงียบเพื่อไม่ให้หน้าจอกระพริบ
-      await this.onSubmit(true);
+      // อัปเดตข้อมูลแบบเงียบเพื่อไม่ให้หน้าจอกระพริบ (ทำเป็น Background เพื่อไม่ให้ปุ่มล็อคนาน)
+      this.onSubmit(true);
     } catch (e) {
       // หากเกิดข้อผิดพลาด ให้ดึงข้อมูลเก่ากลับมาแสดงผล
       mission.is_joined = prevStatus;
@@ -170,8 +159,8 @@ export class Missions implements AfterViewInit, OnInit {
       // ส่งคำสั่งไปยัง Server เพื่อลบชื่อเราออก
       await this._missionService.leaveMission(mission.id);
       console.log(`Successfully left mission ${mission.id}`);
-      // อัปเดตข้อมูลแบบเงียบ (รอให้ sync เสร็จก่อนค่อยปลด lock)
-      await this.onSubmit(true);
+      // อัปเดตข้อมูลแบบเงียบ (ทำเป็น Background เพื่อไม่ให้ปุ่มล็อคนาน)
+      this.onSubmit(true);
     } catch (e) {
       // หากล้มเหลว ให้กลับไปใช้ค่าเดิม
       mission.is_joined = prevStatus;
