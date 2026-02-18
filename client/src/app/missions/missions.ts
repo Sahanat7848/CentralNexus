@@ -116,6 +116,7 @@ export class Missions implements AfterViewInit, OnInit {
     // ตรวจสอบก่อนว่าเราเป็นหัวหน้าหรือเข้าร่วมไปแล้วหรือไม่
     if (mission.is_chief || mission.is_joined || mission.is_processing) return;
 
+    console.log(`Joining mission ${mission.id}...`);
     mission.is_processing = true;
 
     // --- ส่วนของ Optimistic Update (เปลี่ยนหน้าจอทันทีเพื่อให้ดูเร็ว) ---
@@ -127,6 +128,7 @@ export class Missions implements AfterViewInit, OnInit {
     try {
       // ส่งคำสั่งไปยัง Server เพื่อบันทึกลงฐานข้อมูลจริง
       await this._missionService.joinMission(mission.id);
+      console.log(`Successfully joined mission ${mission.id}`);
       // อัปเดตข้อมูลแบบเงียบเพื่อไม่ให้หน้าจอกระพริบ
       await this.onSubmit(true);
     } catch (e) {
@@ -144,6 +146,7 @@ export class Missions implements AfterViewInit, OnInit {
     // ตรวจสอบว่าไม่ใช่หัวหน้า และต้องอยู่ในภารกิจนั้นจริงๆ
     if (mission.is_chief || !mission.is_joined || mission.is_processing) return;
 
+    console.log(`Leaving mission ${mission.id}...`);
     mission.is_processing = true;
 
     // --- ส่วนของ Optimistic Update (ลดจำนวนคนทันทีโดยไม่ต้องรอ Server) ---
@@ -155,6 +158,7 @@ export class Missions implements AfterViewInit, OnInit {
     try {
       // ส่งคำสั่งไปยัง Server เพื่อลบชื่อเราออก
       await this._missionService.leaveMission(mission.id);
+      console.log(`Successfully left mission ${mission.id}`);
       // อัปเดตข้อมูลแบบเงียบ
       await this.onSubmit(true);
     } catch (e) {

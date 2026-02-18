@@ -37,10 +37,9 @@ where
     match crew_operation_use_case.join(mission_id, brawler_id).await {
         Ok(_) => (
             StatusCode::OK,
-            Json(format!(
-                "Brawler({}) join Mission({})",
-                brawler_id, mission_id
-            )),
+            Json(serde_json::json!({
+                "message": format!("Brawler({}) join Mission({})", brawler_id, mission_id)
+            })),
         )
             .into_response(),
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
@@ -59,10 +58,9 @@ where
     match crew_operation_use_case.leave(mission_id, brawler_id).await {
         Ok(_) => (
             StatusCode::OK,
-            Json(format!(
-                "Brawler({}) has leaved Mission({})",
-                brawler_id, mission_id
-            )),
+            Json(serde_json::json!({
+                "message": format!("Brawler({}) has leaved Mission({})", brawler_id, mission_id)
+            })),
         )
             .into_response(),
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),

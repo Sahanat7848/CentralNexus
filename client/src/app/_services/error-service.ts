@@ -40,7 +40,7 @@ export class ErrorService {
           this._router.navigate(['/server-error'], navigationExtras);
           break;
         case 0:
-          this._snackbar.open('Cannot connect to server. Please check your internet connection.', 'OK', this._snackBarConfig);
+          // this._snackbar.open('Cannot connect to server. Please check your internet connection.', 'OK', this._snackBarConfig);
           break;
         default:
           this._snackbar.open(`Error ${error.status}: ${errorMessage}`, 'OK', this._snackBarConfig);
