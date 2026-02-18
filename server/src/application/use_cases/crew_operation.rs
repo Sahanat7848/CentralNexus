@@ -3,7 +3,6 @@ use crate::domain::{
     repositories::{
         crew_oparation::CrewOperationRepository, mission_viewing::MissionViewingRepository,
     },
-    value_object::mission_statuses::MissionStatuses,
 };
 use anyhow::Result;
 use std::sync::Arc;
@@ -50,13 +49,36 @@ where
             .crew_counting(mission_id)
             .await?;
 
-        let mission_status_condition = mission.status == MissionStatuses::Open.to_string()
-            || mission.status == MissionStatuses::Failed.to_string();
+        tracing::info!(
+            "Brawler({}) attempting to join Mission({}). Status: {}, Crew count: {}",
+            brawler_id,
+            mission_id,
+            mission.status,
+            crew_count
+        );
+
+        let status_lower = mission.status.to_lowercase();
+        let mission_status_condition = status_lower == "open" || status_lower == "failed";
+
         if !mission_status_condition {
-            return Err(anyhow::anyhow!("Mission is not joinable"));
+            tracing::warn!(
+                "Mission({}) status '{}' is not joinable",
+                mission_id,
+                mission.status
+            );
+            return Err(anyhow::anyhow!(
+                "Mission is not joinable in current status: {}",
+                mission.status
+            ));
         }
         let crew_count_condition = crew_count < max_crew_per_mission;
         if !crew_count_condition {
+            tracing::warn!(
+                "Mission({}) is full ({} >= {})",
+                mission_id,
+                crew_count,
+                max_crew_per_mission
+            );
             return Err(anyhow::anyhow!("Mission is full"));
         }
 
@@ -76,10 +98,27 @@ where
             .view_detail(mission_id)
             .await?;
 
-        let leaving_condition = mission.status == MissionStatuses::Open.to_string()
-            || mission.status == MissionStatuses::Failed.to_string();
+        tracing::info!(
+            "Brawler({}) attempting to leave Mission({}). Status: {}",
+            brawler_id,
+            mission_id,
+            mission.status
+        );
+
+        let status_lower = mission.status.to_lowercase();
+        let leaving_condition =
+            status_lower == "open" || status_lower == "failed" || status_lower == "inprogress";
+
         if !leaving_condition {
-            return Err(anyhow::anyhow!("Mission is not leavable"));
+            tracing::warn!(
+                "Mission({}) status '{}' is not leavable",
+                mission_id,
+                mission.status
+            );
+            return Err(anyhow::anyhow!(
+                "Mission is not leavable in current status: {}",
+                mission.status
+            ));
         }
         self.crew_operation_repository
             .leave(CrewMemberShips {
