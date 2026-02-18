@@ -138,18 +138,15 @@ impl BrawlerRepository for BrawlerPostgres {
                 m.status, 
                 m.chief_id, 
                 b.display_name as chief_display_name,
-                COALESCE(cc.crew_count, 0) as crew_count,
+                (SELECT COUNT(*) FROM crew_memberships WHERE mission_id = m.id) as crew_count,
                 m.created_at, 
                 m.updated_at
             FROM missions m
             INNER JOIN brawlers b ON b.id = m.chief_id
-            INNER JOIN crew_memberships cm ON cm.mission_id = m.id
-            LEFT JOIN (
-                SELECT mission_id, COUNT(*) as crew_count 
-                FROM crew_memberships 
-                GROUP BY mission_id
-            ) cc ON cc.mission_id = m.id
-            WHERE cm.brawler_id = $1 AND m.deleted_at IS NULL
+            WHERE EXISTS (
+                SELECT 1 FROM crew_memberships cm 
+                WHERE cm.mission_id = m.id AND cm.brawler_id = $1
+            ) AND m.deleted_at IS NULL
             ORDER BY m.created_at DESC
         "#;
 

@@ -79,8 +79,8 @@ export class Missions implements AfterViewInit, OnInit {
     this.dataSource.sort = this.sort;
   }
 
-  async onSubmit() {
-    this.isLoading = true;
+  async onSubmit(silent = false) {
+    if (!silent) this.isLoading = true;
     try {
       const results = await this._missionService.getByFilter(this.filter);
 
@@ -92,7 +92,8 @@ export class Missions implements AfterViewInit, OnInit {
 
         results.forEach(m => {
           m.is_joined = myMissionIds.has(m.id);
-          m.is_chief = m.chief_id === currentUser?.brawler_id || m.chief_display_name === currentUser?.display_name;
+          // ใช้แค่ ID ในการเช็คว่าเป็นเจ้าของหรือไม่ เพื่อความแม่นยำสูงสุด
+          m.is_chief = m.chief_id === currentUser?.brawler_id;
         });
       }
 
@@ -100,7 +101,7 @@ export class Missions implements AfterViewInit, OnInit {
     } catch (e) {
       console.error('Error fetching missions:', e);
     } finally {
-      this.isLoading = false;
+      if (!silent) this.isLoading = false;
     }
   }
 
@@ -113,7 +114,9 @@ export class Missions implements AfterViewInit, OnInit {
   // ฟังก์ชันสำหรับกดเข้าร่วมภารกิจ
   async joinMission(mission: Mission) {
     // ตรวจสอบก่อนว่าเราเป็นหัวหน้าหรือเข้าร่วมไปแล้วหรือไม่
-    if (mission.is_chief || mission.is_joined) return;
+    if (mission.is_chief || mission.is_joined || mission.is_processing) return;
+
+    mission.is_processing = true;
 
     // --- ส่วนของ Optimistic Update (เปลี่ยนหน้าจอทันทีเพื่อให้ดูเร็ว) ---
     const prevStatus = mission.is_joined; // เก็บสถานะเก่าไว้เผื่อต้องย้อนกลับ
@@ -124,20 +127,24 @@ export class Missions implements AfterViewInit, OnInit {
     try {
       // ส่งคำสั่งไปยัง Server เพื่อบันทึกลงฐานข้อมูลจริง
       await this._missionService.joinMission(mission.id);
-      // ดึงข้อมูลใหม่มาอัปเดตหน้าจออีกครั้งเพื่อความแม่นยำ
-      this.onSubmit();
+      // อัปเดตข้อมูลแบบเงียบเพื่อไม่ให้หน้าจอกระพริบ
+      await this.onSubmit(true);
     } catch (e) {
       // หากเกิดข้อผิดพลาด ให้ดึงข้อมูลเก่ากลับมาแสดงผล
       mission.is_joined = prevStatus;
       mission.crew_count = prevCount;
       console.error('เกิดข้อผิดพลาดในการเข้าร่วมภารกิจ:', e);
+    } finally {
+      mission.is_processing = false;
     }
   }
 
   // ฟังก์ชันสำหรับกดออกจากภารกิจ
   async leaveMission(mission: Mission) {
     // ตรวจสอบว่าไม่ใช่หัวหน้า และต้องอยู่ในภารกิจนั้นจริงๆ
-    if (mission.is_chief || !mission.is_joined) return;
+    if (mission.is_chief || !mission.is_joined || mission.is_processing) return;
+
+    mission.is_processing = true;
 
     // --- ส่วนของ Optimistic Update (ลดจำนวนคนทันทีโดยไม่ต้องรอ Server) ---
     const prevStatus = mission.is_joined;
@@ -148,13 +155,15 @@ export class Missions implements AfterViewInit, OnInit {
     try {
       // ส่งคำสั่งไปยัง Server เพื่อลบชื่อเราออก
       await this._missionService.leaveMission(mission.id);
-      // อัปเดตข้อมูลหน้าจอใหม่
-      this.onSubmit();
+      // อัปเดตข้อมูลแบบเงียบ
+      await this.onSubmit(true);
     } catch (e) {
       // หากล้มเหลว ให้กลับไปใช้ค่าเดิม
       mission.is_joined = prevStatus;
       mission.crew_count = prevCount;
       console.error('เกิดข้อผิดพลาดในการออกจากภารกิจ:', e);
+    } finally {
+      mission.is_processing = false;
     }
   }
 }

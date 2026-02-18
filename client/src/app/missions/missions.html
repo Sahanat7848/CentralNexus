@@ -99,12 +99,14 @@
                         <span>My Activity 🎀</span>
                     </button>
                     } @else if(mission.is_joined) {
-                    <button mat-button class="join-action-btn joined" (click)="leaveMission(mission)">
+                    <button mat-button class="join-action-btn joined" (click)="leaveMission(mission)"
+                        [disabled]="mission.is_processing">
                         <mat-icon>waving_hand</mat-icon>
                         <span>Leave mission</span>
                     </button>
                     } @else {
-                    <button mat-button class="join-action-btn" (click)="joinMission(mission)">
+                    <button mat-button class="join-action-btn" (click)="joinMission(mission)"
+                        [disabled]="mission.is_processing">
                         <mat-icon>celebration</mat-icon>
                         <span>Join in! ✨</span>
                     </button>

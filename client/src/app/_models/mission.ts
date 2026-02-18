@@ -13,4 +13,5 @@ export interface Mission {
     // Client-side only properties
     is_joined?: boolean;
     is_chief?: boolean;
+    is_processing?: boolean;
 }

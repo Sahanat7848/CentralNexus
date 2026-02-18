@@ -23,28 +23,29 @@ impl CrewParticipationPostgres {
 
 #[async_trait]
 impl CrewOperationRepository for CrewParticipationPostgres {
-    async fn join(&self, crew_memberships: CrewMemberShips) -> Result<()> {
+    async fn join(&self, data: CrewMemberShips) -> Result<()> {
         let mut connection = self
             .db_pool
             .get()
             .map_err(|e| anyhow::Error::msg(e.to_string()))?;
 
         diesel::insert_into(crew_memberships::table)
-            .values(&crew_memberships)
+            .values(&data)
+            .on_conflict_do_nothing()
             .execute(&mut connection)?;
 
         Ok(())
     }
 
-    async fn leave(&self, crew_memberships: CrewMemberShips) -> Result<()> {
+    async fn leave(&self, data: CrewMemberShips) -> Result<()> {
         let mut connection = self
             .db_pool
             .get()
             .map_err(|e| anyhow::Error::msg(e.to_string()))?;
 
         diesel::delete(crew_memberships::table)
-            .filter(crew_memberships::brawler_id.eq(crew_memberships.brawler_id))
-            .filter(crew_memberships::mission_id.eq(crew_memberships.mission_id))
+            .filter(crew_memberships::brawler_id.eq(data.brawler_id))
+            .filter(crew_memberships::mission_id.eq(data.mission_id))
             .execute(&mut connection)?;
 
         Ok(())
@@ -53,10 +54,11 @@ impl CrewOperationRepository for CrewParticipationPostgres {
     fn for_insert_transaction_test(
         &self,
         conn: &mut PgConnection,
-        crew_memberships: CrewMemberShips,
+        data: CrewMemberShips,
     ) -> Result<()> {
         diesel::insert_into(crew_memberships::table)
-            .values(&crew_memberships)
+            .values(&data)
+            .on_conflict_do_nothing()
             .execute(conn)?;
 
         Ok(())
@@ -65,11 +67,11 @@ impl CrewOperationRepository for CrewParticipationPostgres {
     fn for_delete_transaction_test(
         &self,
         conn: &mut PgConnection,
-        crew_memberships: CrewMemberShips,
+        data: CrewMemberShips,
     ) -> Result<()> {
         delete(crew_memberships::table)
-            .filter(crew_memberships::brawler_id.eq(crew_memberships.brawler_id))
-            .filter(crew_memberships::mission_id.eq(crew_memberships.mission_id))
+            .filter(crew_memberships::brawler_id.eq(data.brawler_id))
+            .filter(crew_memberships::mission_id.eq(data.mission_id))
             .execute(conn)?;
 
         Ok(())
